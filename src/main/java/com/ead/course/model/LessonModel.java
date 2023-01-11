@@ -2,6 +2,7 @@ package com.ead.course.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -27,5 +28,9 @@ public class LessonModel implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime localDateTime;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização há nível de api
+    @ManyToOne(optional = false) //optional garante que as lições (muitos) estão vincúladas a um módulo (um)
+    private ModuleModel module;
 
 }
