@@ -32,6 +32,6 @@ public class ModuleModel {
     private CourseModel course;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização
-    @OneToMany(mappedBy = "module")
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     private Set<LessonModel> lessons;
 }
