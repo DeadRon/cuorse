@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -34,7 +36,8 @@ public class ModuleModel {
     private CourseModel course;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização
-    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SELECT)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<LessonModel> lessons;
 }
