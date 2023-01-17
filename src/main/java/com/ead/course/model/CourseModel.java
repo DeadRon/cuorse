@@ -52,7 +52,6 @@ public class CourseModel implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<ModuleModel> modules;
 
 }

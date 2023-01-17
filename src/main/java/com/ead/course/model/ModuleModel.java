@@ -38,6 +38,5 @@ public class ModuleModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização
     @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SELECT)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<LessonModel> lessons;
 }
