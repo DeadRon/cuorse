@@ -68,3 +68,118 @@ private Set<ModuleModel> modules;
   - [Exclusão de Lessons relacionado com um Module](https://github.com/DeadRon/cuorse/commit/1a4e604fefdcaf67de08c0e79ca4b295e5998642).
   - [Exclusão de Modules relacionado com um Course](https://github.com/DeadRon/cuorse/commit/85df331e11a37fa256afb8283c92faabf6bda7dc).
   - [Exclusão do Course](https://github.com/DeadRon/cuorse/commit/85df331e11a37fa256afb8283c92faabf6bda7dc)
+
+
+## Criar API RESTful para Course com Validação Spring Validation
+
+
+**[Cuorse End Pont para](https://github.com/DeadRon/cuorse/commit/f894f216b7d76607d27ef08122ea2259861e9423)**:
+- [CourseDTO](https://github.com/DeadRon/cuorse/commit/160108269670d0e6514c4ab5f776b01c3baa0366)
+- Salvar Course
+````java
+    @PostMapping
+    public ResponseEntity<Object> saveCuorse(@RequestBody @Valid CourseDTO courseDTO){
+        var cuorseModel = new CourseModel();
+        BeanUtils.copyProperties(courseDTO, cuorseModel);
+        cuorseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        cuorseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.save(cuorseModel));
+    }
+````
+- Deletar Course
+````java
+    @DeleteMapping("/{courseId}")
+public ResponseEntity<Object> deleteCuorse(@PathVariable(value = "courseId") UUID courseId){
+        Optional<CourseModel> cuorseModelOptional = courseService.findBy(courseId);
+        if(!cuorseModelOptional.isPresent()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found");
+        }
+        courseService.delete(cuorseModelOptional.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body("Course deleted successfully");
+        }
+````
+- Atualizar Course
+````java
+    @PutMapping("/{courseId}")
+    public ResponseEntity<Object> updateCuorse(@PathVariable(value = "courseId") UUID courseId, @RequestBody @Valid CourseDTO courseDTO){
+        Optional<CourseModel> cuorseModelOptional = courseService.findBy(courseId);
+        if(!cuorseModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cuorse Not Found");
+        }
+        CourseModel courseModel = cuorseModelOptional.get();
+        courseModel.setName(courseDTO.getName());
+        courseModel.setDescription(courseDTO.getDescription());
+        courseModel.setImageURL(courseDTO.getImageUrl());
+        courseModel.setCourseStatus(courseDTO.getCourseStatus());
+        courseModel.setCourseLevel(courseModel.getCourseLevel());
+        courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        courseService.save(courseModel);
+
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.save(courseModel));
+    }
+````
+- Buscar todos os Course's
+````java
+    @GetMapping
+    public ResponseEntity<List<CourseModel>> getAllCourses(){
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll());
+    }
+````
+- Buscar Course por Id
+````java
+    @GetMapping("/{courseId}")
+    public ResponseEntity<Object> getCourseById(@PathVariable(value = "courseId") UUID courseId){
+
+        Optional<CourseModel> courseModelOptional = courseService.findBy(courseId);
+        if(!courseModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(courseModelOptional);
+    }
+````
+
+
+**[Novos métodos de CourseService](https://github.com/DeadRon/cuorse/commit/c6f16acb20264832bd7d3505893daf3d617d2d5d)**:
+- Salvar Course
+````java
+CourseModel save(CourseModel cuorseModel);
+````
+- Buscar Course por Id
+````java
+Optional<CourseModel> findBy(UUID cuorseId);
+````
+- Buscar todos os Course's
+````java
+List<CourseModel> findAll();
+````
+
+**Implementações de Cuorse Service**
+- Salvar Course
+````java
+    @Override
+    public CourseModel save(CourseModel cuorseModel) {
+        return courseRepository.save(cuorseModel);
+    }
+````
+- Buscar Course por Id
+````java
+    @Override
+    public Optional<CourseModel> findBy(UUID courseId) {
+        return courseRepository.findById(courseId);
+    }
+````
+- Buscar todos os Course's
+````java
+    @Override
+    public List<CourseModel> findAll() {
+        return courseRepository.findAll();
+    }
+````
+
+[Correção da consulta](https://github.com/DeadRon/cuorse/commit/79474415c0d707c8221a35c05be6e40203144c9a) SQL para recuperar todos os módulos relacionados à um curso
+````java
+    @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId", nativeQuery = true)
+    List<ModuleModel> findAllModulesIntoCourse(@Param("courseId") UUID courseId);
+````
