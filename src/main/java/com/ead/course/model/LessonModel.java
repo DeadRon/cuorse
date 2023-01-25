@@ -30,7 +30,7 @@ public class LessonModel implements Serializable {
     private LocalDateTime localDateTime;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização há nível de api
-    @ManyToOne(optional = false) //optional garante que as lições (muitos) estão vincúladas a um módulo (um)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY) //optional garante que as lições (muitos) estão vincúladas a um módulo (um)
     private ModuleModel module;
 
 }
