@@ -292,30 +292,30 @@ List<CourseModel> findAll();
         ````
 
 - **End point para buscar um módulo**
-- receber como argumento um id de curso e módulo
-- chamar o método findModuleIntoCourse do ModuleService para encontrar um módulo
-  - passar id de curso e módulo como parâmetro
-- retornar status OK com o módulo achado
- - ````java
-    @GetMapping("/courses/{courseId}/modules/{moduleId}")
-    public ResponseEntity<Object> getOneModule(@PathVariable("courseId")UUID courseId,
-    @PathVariable("moduleId")UUID moduleId){
-    Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
-        if(!moduleModelOptional.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course.");
-        }
+  - receber como argumento um id de curso e módulo
+  - chamar o método findModuleIntoCourse do ModuleService para encontrar um módulo
+    - passar id de curso e módulo como parâmetro
+  - retornar status OK com o módulo achado
+  - ````java
+     @GetMapping("/courses/{courseId}/modules/{moduleId}")
+     public ResponseEntity<Object> getOneModule(@PathVariable("courseId")UUID courseId,
+     @PathVariable("moduleId")UUID moduleId){
+     Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
+         if(!moduleModelOptional.isPresent()){
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course.");
+         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(moduleModelOptional.get());
-    }
-   ````
+         return ResponseEntity.status(HttpStatus.OK).body(moduleModelOptional.get());
+     }
+    ````
 
-    - declarar método findModuleIntoCourse na interface ModuleService e implementar
-      - ````java
-        Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
-        ```` 
-    - declarar método findModuleIntoCourse na interface ModuleRepository
-      - usar @query para criar uma uma consulta SQL nativa
-        - "SELECT * FROM tb_modules WHERE course_course_id = :courseId"
+  - declarar método findModuleIntoCourse na interface ModuleService e implementar
+       - ````java
+         Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
+         ```` 
+  - declarar método findModuleIntoCourse na interface ModuleRepository
+    - usar @query para criar uma uma consulta SQL nativa
+      - "SELECT * FROM tb_modules WHERE course_course_id = :courseId"
     - ````java
       @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId AND module_Id = :moduleId", nativeQuery = true)
       Optional<ModuleModel> findModuleIntoCourse(@Param("courseId") UUID courseId, @Param("moduleId")UUID moduleId);
