@@ -183,3 +183,141 @@ List<CourseModel> findAll();
     @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId", nativeQuery = true)
     List<ModuleModel> findAllModulesIntoCourse(@Param("courseId") UUID courseId);
 ````
+
+## Criar RESTful para Module com Validações
+
+### EndPoint Module
+
+***Ponto de atenção: um módulo está sempre associado com um Curso, então qualquer ação que envolva algum módulo deve levar em consideração o Curso ao qual este Módulo pertence***
+
+- **End Point para salvar Module**
+  - [Criar ModuleDTO](https://github.com/DeadRon/cuorse/commit/27f92b253bbad043e36cf583614615edfa8d34f0)
+  - Verificar se Course existe através do CourseId, copiar propriedades do DTO para um Model, setar creationDate e lastUpdate com dia/hora atual e salvar Module
+  - ````java
+    @PostMapping("/courses/{courseId}/modules")
+    public ResponseEntity<Object> saveModule(@PathVariable("courseId")UUID cuorseId, @RequestBody @Valid ModuleDTO moduleDTO){
+
+        Optional<CourseModel> courseModelOptional = courseService.findBy(cuorseId);
+        if(!courseModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found");
+        }
+
+        var moduleModel = new ModuleModel();
+        BeanUtils.copyProperties(moduleDTO, moduleModel);
+        moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        moduleModel.setCourse(courseModelOptional.get());
+        return ResponseEntity.status(HttpStatus.CREATED).body(moduleService.save(moduleModel));
+    }
+    ````
+  - Declarar método Save na interface ModuleService
+    - ````java
+      ModuleModel save(ModuleModel moduleModel);
+      ````
+      - Implementar método Save na implementação da interface ModuleService e chamar ModuleRepository e salvar o módulo com método Save
+      - ````java
+        @Override
+        public ModuleModel save(ModuleModel moduleModel) {
+            return moduleRepository.save(moduleModel);
+        }
+        ````
+
+- **End Point para deletar Module**
+  - Verificar se Course existe através do CourseId - para um Module existir precisa estar vínculado com um Course
+  - Verificar se Module existe através do ModuleId
+  - ````java
+    @Transactional
+    @Override
+    public void delete(ModuleModel module) {
+        List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoCourse(module.getModuleId());
+        if(!lessonModels.isEmpty()){
+            lessonRepository.deleteAll(lessonModels);
+        }
+        moduleRepository.delete(module);
+    }
+    ````
+    - Declarar método findModuleIntoCourse na interface ModuleService, implementar findModuleIntoCourse Save na implementação da interface ModuleService - verifica se um módulo existe dentro de um curso
+    - Declarar método findModuleIntoCourse na interface ModuleRepository, deve retornar um Optinal<ModuleModel>.
+      - extrair valor dos parâmetos CourseId e ModuleId com @Param
+      - Usar SQL Query para buscar um módulo que tenha CourseId e ModuleId iguais ao valores CourseId e ModuleId
+        passados no parâmetro do método findModuleIntoCourse.
+        - SELECT * FROM tb_modules WHERE course_course_id = :courseId
+    - ````java
+      @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId AND module_Id = :moduleId", nativeQuery = true)
+      Optional<ModuleModel> findModuleIntoCourse(@Param("courseId") UUID courseId, @Param("moduleId")UUID moduleId);
+      ````
+
+  - No controller usar método delete de ModuleService para deletar Module. Na implementação chamar método **delete** do Repository
+  - retornar status OK
+
+- **End Point para atulizar Module**
+  - Parâmetros necessários: CourseId, ModuleId, ModuleDTO
+  - Verificar de Module existe antes de atualizar
+    - Usar método findModuleIntoCourse do ModuleService
+  - Atualizar Module - Apenas Title e Description podem ser atualizados
+  - Chamar método Save da Interface ModuleSerive para salvar as alterações
+  - Retornar status OK
+
+- **End point para buscar todos os módulos de um curso**
+  - retornar ResponseEntity com status OK com um corpo na resposta
+  - ````java
+    public ResponseEntity<Object> updateModule(@PathVariable("courseId")UUID courseId,
+                                               @PathVariable("moduleId")UUID moduleId,
+                                               @RequestBody @Valid ModuleDTO moduleDTO){
+
+        Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
+        if(!moduleModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course.");
+        }
+
+        var moduleModel = moduleModelOptional.get();
+        moduleModel.setDescription(moduleDTO.getDescription());
+        moduleModel.setTitle(moduleDTO.getTitle());
+
+        return ResponseEntity.status(HttpStatus.OK).body(moduleService.save(moduleModel));
+    }    
+    ````
+    - chamar o método findAllByCourse da interface ModuleService e passar como argumento o id de um curso
+      - declarar o método findAllByCourse na interface ModuleService e implentar o método findAllByCourse declarado na interface
+      - ````java
+        Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId); 
+        ````
+      - declarar no ModuleRepository o método findAllByCourse, recebe como argumento o id o do curso
+        - usar @query para criar uma uma consulta SQL nativa                                  
+        - ````sql
+          SELECT * FROM tb_modules WHERE course_course_id = :courseId AND module_Id = :moduleId
+          ````
+      - ````java
+        @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId", nativeQuery = true)
+        Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
+        ````
+
+- **End point para buscar um módulo**
+- receber como argumento um id de curso e módulo
+- chamar o método findModuleIntoCourse do ModuleService para encontrar um módulo
+  - passar id de curso e módulo como parâmetro
+- retornar status OK com o módulo achado
+ - ````java
+    @GetMapping("/courses/{courseId}/modules/{moduleId}")
+    public ResponseEntity<Object> getOneModule(@PathVariable("courseId")UUID courseId,
+    @PathVariable("moduleId")UUID moduleId){
+    Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
+        if(!moduleModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(moduleModelOptional.get());
+    }
+   ````
+
+    - declarar método findModuleIntoCourse na interface ModuleService e implementar
+      - ````java
+        Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
+        ```` 
+    - declarar método findModuleIntoCourse na interface ModuleRepository
+      - usar @query para criar uma uma consulta SQL nativa
+        - "SELECT * FROM tb_modules WHERE course_course_id = :courseId"
+    - ````java
+      @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId AND module_Id = :moduleId", nativeQuery = true)
+      Optional<ModuleModel> findModuleIntoCourse(@Param("courseId") UUID courseId, @Param("moduleId")UUID moduleId);
+      ````  
+
