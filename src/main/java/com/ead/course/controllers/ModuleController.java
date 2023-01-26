@@ -30,9 +30,9 @@ public class ModuleController {
     CourseService courseService;
 
     @PostMapping("/courses/{courseId}/modules")
-    public ResponseEntity<Object> saveModule(@PathVariable("courseId")UUID cuorseId, @RequestBody @Valid ModuleDTO moduleDTO){
+    public ResponseEntity<Object> saveModule(@PathVariable("courseId")UUID courseId, @RequestBody @Valid ModuleDTO moduleDTO){
 
-        Optional<CourseModel> courseModelOptional = courseService.findBy(cuorseId);
+        Optional<CourseModel> courseModelOptional = courseService.findBy(courseId);
         if(!courseModelOptional.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course Not Found");
         }
