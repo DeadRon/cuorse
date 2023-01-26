@@ -1,7 +1,11 @@
 
-## FetchType Eager/Lazy, @EntityGraph, FetchMode SELECT/SUBSELECT/JOIN, @Query e @Modify
+# SEMANA 2 - Spring Data JPA: Do Básico ao Avançado
+## Entities, Repositories, OnetoMany e ManyToOne, FetchType Eager/Lazy, @EntityGraph, FetchMode SELECT/SUBSELECT/JOIN, @Query e @Modify, Cascade.ALL, ISO 8601 UTC Date
 
-### Relação “many to one/one to many” Course/Module:
+
+### FetchType Eager/Lazy, @EntityGraph, FetchMode SELECT/SUBSELECT/JOIN, @Query e @Modify
+
+#### Relação “many to one/one to many” Course/Module:
 Para especificar a relação **one to many/many** to one  no lado muitos da relação é preciso declarar uma instância da entidade  no lado um da relação e anotá-la com a anotação **@ManyToOne**. O parâmetro **opcional** da anotação garante que as entidades do lado muitos estão obrigatoriamente vinculadas a um  módulo, em outras palavras ele indica se irá haver um relacionamento não nulo caso o parâmetro receba valor “false”.
 
 Por exemplo: Na relação entre cursos e módulos, **um curso pode ter vários módulos** e **um módulo está sempre associado a um curso**. Para especificar para o JPA a relação de muitos módulos para um curso é preciso declarar na classe [Module](https://github.com/DeadRon/cuorse/commit/222084bbe7f9e08d935b7753c9e59a8b529cd244) uma variável do tipo curso e anotar com anotação **@ManyToOne** e passar o valor boolean **false** no  parâmetro **optional** para indicar uma relação não nulo entre as entidades igual mostra o trecho de código abaixo:
@@ -21,13 +25,13 @@ private Set<LessonModel> lessons;
 
 Observação: o não uso uso do **mappedBy**  não impede que o hibernate construa a relação um para muitos porém serão criadas tabelas auxiliares para implementar a relação  com o uso do mappedBy o hibernate irá criar uma chave estrangeira nas entidades(**Modules**) do lado muitos para referenciar a Entidade do lado um'**(**Cuorse**) a qual todas as entidades  do lado muitos estão associadas.
 
-### FETCH TYPE
+#### FETCH TYPE
 
 Define **SE** os dados **serão ou não carregados** do banco de dados no momento em que a consulta é feita. Isso é definido no lado muitos ou many da relação. Toda vez que o banco consultar uma entidade que tenha muitas entidades  associadas a ela, este FETCH será feito e nesse caso específico irá trazer ou não as muitas entidades associadas a ele no momento da consulta. Isso pode causar problemas  de desempenho caso o banco possua muitos registros associados à uma entidade, porque na maioria dos casos não há necessidade de ver todos os dados associados a um registro, apenas o registro em si será necessário. Para evitar esse cenário o **FETCH.LAZY**, que indica ao JPA um carregamento lento, irá trazer apenas um registro do banco de dados sem a muitas entidades associadas a este registro. Mas em caso de haver a necessidade de trazer as muitas entidades associadas à entidade consultada, é usado o  **FETCH.EAGLE**, que indica ao JPA um carregamento rápido, que irá trazer o registro do banco de dados e as muitas entidades associadas a este registro. Para especificar  qual tipo de fetch será usado basta usar o parâmetro *fetch* da anotação [**@OneToMany**](https://github.com/DeadRon/cuorse/commit/71837839bff8ba45e0b03d67ab55f927966d4a5e) e especificar o FetchType a ser usado. O uso de **FETCH** também é válido no caso de haver  uma consulta de uma entidade do lado muitos da relação e não seja necessário visualizar a entidade associado no lado um da relação.
 
 Essas estratégias de carregamento não podem ser alteradas em tempos de execução, são estáticas. Se eventualmente for necessário carregar dados de um Módulo ESPECÍFICO de forma que sejam exibidos dados do curso que o módulo está vinculado e se o fetch ser definido como LAZY haverá um problema. Para situações de exceção como essa em que é preciso alterar o tipo de carregamento em tempo de execução é usado o [**@EntityGraph**](https://github.com/DeadRon/cuorse/commit/750c54944eab676755ce5795e564622cc1cf2d3e), dessa forma é como se o tipo do fetch para Curso definido na classe Módulo seja alterado para EAGLE ao invés de LAZY em tempo de execução.
 
-### FETCH MODE
+#### FETCH MODE
 **Define o tipo de carregamento** utilizado quando ouver a consulta. Há 3 formas de definir o tipo de carregamento:
 
 - [**SELECT**](https://github.com/DeadRon/cuorse/commit/e148ad9e65baf8261ad4cce35247cf0f85105c07): Faz uma consulta para buscar uma entidade e depois faz uma consulta para cada entidade associada a esta entidade. Em um cenário de elevado volume de dados isso pode causar problemas de desempenho.
@@ -70,7 +74,7 @@ private Set<ModuleModel> modules;
   - [Exclusão do Course](https://github.com/DeadRon/cuorse/commit/85df331e11a37fa256afb8283c92faabf6bda7dc)
 
 
-## Criar API RESTful para Course com Validação Spring Validation
+### Criar API RESTful para Course com Validação Spring Validation
 
 
 **[Cuorse End Pont para](https://github.com/DeadRon/cuorse/commit/f894f216b7d76607d27ef08122ea2259861e9423)**:
@@ -185,8 +189,6 @@ List<CourseModel> findAll();
 ````
 
 ## Criar RESTful para Module com Validações
-
-### EndPoint Module
 
 ***Ponto de atenção: um módulo está sempre associado com um Curso, então qualquer ação que envolva algum módulo deve levar em consideração o Curso ao qual este Módulo pertence***
 
@@ -321,3 +323,51 @@ List<CourseModel> findAll();
       Optional<ModuleModel> findModuleIntoCourse(@Param("courseId") UUID courseId, @Param("moduleId")UUID moduleId);
       ````  
 
+### Criar RESTful para Lesson com Validações
+- **URLs são definidas a nivel de método**
+
+
+- **[Criar Lesson Controller](https://github.com/DeadRon/cuorse/commit/6f0f55f4755aa6b6c667efee20ab8e5e0deded3a)**
+  - **End point para salvar um lesson**
+    - URL: "modules/{moduleId}/lessons
+    - Deve estar vinculado à um módulo obrigatóriamente
+    - Criar LessonDTO - título e videoUrl são obrigatórios
+    - Buscar módulo por Id
+      - Service e repository. Usar o findById de JPARepository
+    - Setar data de criação do lesson com data/hora atual
+    - Vincular com o módulo buscado
+    - Salvar
+    - Retornar Status 200 OK com os do Lesson criado
+
+  - Deletar lesson por Id
+    - URL: "modules/{moduleId}/lessons/{lessonId}
+    - Deve estar vinculado à um módulo obrigatóriamente
+    - Buscar lesson com o método findLessonIntoModule do LessonService.
+      - Declarar método na interface LessonService e na Interface LessonRepository. No repository declarar método findLessonIntoModule
+        - Retorna um Optional de Lesson
+      - O funcionamento é semelhante lógica de encontrar um módulo dentro de curso feito antes
+      - Como parâmetro recebe muduleId e lessonId.
+    - Lesson nao tem uma associação em cascata, usar o método delete do JPARepository
+
+  - Update Lesson
+    - URL: "modules/{moduleId}/lessons/{lessonId}
+    - Receber novas informações no LessonDTO
+    - Deve estar vinculado à um módulo obrigatóriamente
+    - Buscar lesson com o método findLessonIntoModule do LessonService.
+      - Atulizar dados title, description e videoURL
+    - Retornar Status 200 OK com os do Lesson atualizado
+
+  - Recuperar todos os Lessons de um Module
+    - URL: /modules/{moduleId}/lessons
+    - chamar método findAllByModule do LessonService.
+      - Declarar método findAllLessonsByModule na interface [LessonService](https://github.com/DeadRon/cuorse/commit/94914cda8563316b0bc0e90b8a2ab95b0ea6184d) e [implementar](https://github.com/DeadRon/cuorse/commit/94914cda8563316b0bc0e90b8a2ab95b0ea6184d)
+      - declarar método findAllLessonsByModule na interface [LessonRepository](https://github.com/DeadRon/cuorse/commit/9bde2b4a00baa2e6f118a038585c146e9d4dacac) com @Query
+        - Usar SQL semelhante ao de buscar todos os cursos de UM módulos.
+
+  - Recuperar Lesson por ModuleId e LessonId
+    - URL: "modules/{moduleId}/lessons/{lessonId}
+    - Deve estar vinculado à um módulo obrigatóriamente
+    - Buscar lesson com o método findLessonIntoModule do LessonService.
+    - Retornar Status 200 OK com os do Lesson buscado
+
+  - Teste end point de deleções de Cursos para verficar se a deleção em cascata funciona

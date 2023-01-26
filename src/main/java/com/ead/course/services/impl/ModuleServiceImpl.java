@@ -25,7 +25,7 @@ public class ModuleServiceImpl implements ModuleService {
     @Transactional
     @Override
     public void delete(ModuleModel module) {
-        List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoCourse(module.getModuleId());
+        List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoModule(module.getModuleId());
         if(!lessonModels.isEmpty()){
             lessonRepository.deleteAll(lessonModels);
         }
@@ -45,5 +45,10 @@ public class ModuleServiceImpl implements ModuleService {
     @Override
     public List<ModuleModel> findAllByCourse(UUID courseId) {
         return moduleRepository.findAllModulesIntoCourse(courseId);
+    }
+
+    @Override
+    public Optional<ModuleModel> findById(UUID moduleId) {
+        return moduleRepository.findById(moduleId);
     }
 }

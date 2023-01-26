@@ -7,7 +7,6 @@ import com.ead.course.repository.CourseRepository;
 import com.ead.course.repository.LessonRepository;
 import com.ead.course.repository.ModuleRepository;
 import com.ead.course.services.CourseService;
-import com.ead.course.services.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,7 @@ public class CourserServiceImpl implements CourseService {
         List<ModuleModel> moduleModelList = moduleRepository.findAllModulesIntoCourse(courseModel.getCourseId());
         if(!moduleModelList.isEmpty()){
             for (ModuleModel module: moduleModelList) {
-                List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoCourse(module.getModuleId());
+                List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoModule(module.getModuleId());
                 if(!lessonModels.isEmpty()){
                     lessonRepository.deleteAll(lessonModels);
                 }
