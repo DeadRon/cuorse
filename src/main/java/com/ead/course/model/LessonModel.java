@@ -25,9 +25,11 @@ public class LessonModel implements Serializable {
     private String title;
     @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    private String videoUrl;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(nullable = false)
-    private LocalDateTime localDateTime;
+    private LocalDateTime creationDate;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//não permite a serialização há nível de api
     @ManyToOne(optional = false, fetch = FetchType.LAZY) //optional garante que as lições (muitos) estão vincúladas a um módulo (um)
