@@ -1,4 +1,4 @@
-package com.ead.course.controllers.dto;
+package com.ead.course.dto;
 
 import lombok.Data;
 

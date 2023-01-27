@@ -1,6 +1,6 @@
 package com.ead.course.controllers;
 
-import com.ead.course.controllers.dto.LessonDTO;
+import com.ead.course.dto.LessonDTO;
 import com.ead.course.model.LessonModel;
 import com.ead.course.model.ModuleModel;
 import com.ead.course.services.LessonService;
