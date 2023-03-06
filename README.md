@@ -371,3 +371,53 @@ List<CourseModel> findAll();
     - Retornar Status 200 OK com os do Lesson buscado
 
   - Teste end point de deleções de Cursos para verficar se a deleção em cascata funciona
+
+### Filtros Avançados em APIs com Specification e Pageable
+ - Adicionar dependência do Specfication Arg Resolver no pom.xml
+   - Configurar um ResolverConfig no pacote de config
+     - ````java
+        @Configuration
+        public class ResolverConfig extends WebMvcConfigurationSupport {
+          @Override
+          public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+              argumentResolvers.add(new SpecificationArgumentResolver());
+              PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
+              argumentResolvers.add(resolver);
+              super.addArgumentResolvers(argumentResolvers);
+          }
+        }
+     ````   
+
+
+ - Criar Specfication Template
+   - ````java
+     public class SpecificationTemplate {
+       @And({
+               @Spec(path = "courseLevel", spec = Equal.class),
+               @Spec(path = "courseStatus", spec = Equal.class),
+               @Spec(path = "name", spec = Like.class)
+       })
+       public interface CourseSpec extends Specification<CourseModel> {}
+          public static Specification<ModuleModel> moduleCourseId(final UUID courseId){
+              return (root, query, cb) -> {
+                   query.distinct(true);
+                   Root<ModuleModel> module = root;
+                   Root<CourseModel> course = query.from(CourseModel.class);
+                   Expression<Collection<ModuleModel>> coursesModules = course.get("modules");
+                   return cb.and(cb.equal(course.get("modules"), courseId), cb.isMember(module, coursesModules));
+              };
+        }
+     }
+     ````
+ - Declarar o Especification e um Pageable como argumento do end point que rotorna todos os cursos
+   - ````java
+      @GetMapping
+      public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec courseSpec, @PageableDefault(page = 0, size = 10, sort = "courseId", direction = ASC) Pageable pageable){
+             return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(courseSpec, pageable));
+      }
+     ````
+
+- Refatorar método findAll de CourseService para receber como argumento um SpecificationTemplete do tipo criado acima e um Pageable
+- CourseRepository deve extender JpaSpecificationExecutor<CourseModel>, assim CourseService consegui chamar o utilizar o método findAll
+que suporta um Specification e um Pageable.
+- Refatorar os tipos de retorno nas camadas de service e controller
