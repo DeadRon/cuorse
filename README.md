@@ -421,3 +421,11 @@ List<CourseModel> findAll();
 - CourseRepository deve extender JpaSpecificationExecutor<CourseModel>, assim CourseService consegui chamar o utilizar o método findAll
 que suporta um Specification e um Pageable.
 - Refatorar os tipos de retorno nas camadas de service e controller
+
+### Boas Práticas de Datas nas APIs utilizando o Padrão ISO 8601 UTC
+
+Padrão ISO 8601 UTC é um padrão internacional para datas e horas, garanta que haja entregas das melhorias,
+evita mais interpretações
+
+formato: "yyyy-MM-dd'T'HH:mm:ss'Z" -> Z significa que a data foi salva no padrão UTC. UTC(Offset)
+é o horário referente ao meridiano de greenwich
