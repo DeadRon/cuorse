@@ -6,6 +6,8 @@ import com.ead.course.model.ModuleModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
 import com.ead.course.specification.SpecificationTemplate;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import java.util.UUID;
 
 import static com.ead.course.specification.SpecificationTemplate.moduleCourseId;
 
+@Log4j2
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class LessonController {
@@ -55,13 +58,15 @@ public class LessonController {
     @DeleteMapping("modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<Object> deleteLesson(@PathVariable("moduleId")UUID moduleId,
                                                @PathVariable("lessonId")UUID lessonId){
-
+        log.debug("DELETE deleteLesson lessonId received {} ", lessonId);
         Optional<LessonModel> lessonModel  = lessonService.findLessonIntoCourse(moduleId, lessonId);
         if (!lessonModel.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson Not Found");
         }
 
         lessonService.delete(lessonModel.get());
+        log.debug("DELETE deleteLesson lessonId deleted {} ", lessonId);
+        log.info("Lesson deleted successfully lessonId {} ", lessonId);
         return ResponseEntity.status(HttpStatus.OK).body("Lesson deleted successfully.");
     }
 
@@ -69,7 +74,7 @@ public class LessonController {
     public ResponseEntity<Object> updateLesson(@PathVariable("moduleId")UUID moduleId,
                                                @PathVariable("lessonId")UUID lessonId,
                                                @RequestBody @Valid LessonDTO lessonDTO){
-
+        log.debug("PUT updateLesson lessonDto received {} ", lessonDTO.toString());
         Optional<LessonModel> lessonModelOptional  = lessonService.findLessonIntoCourse(moduleId, lessonId);
         if (!lessonModelOptional.isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson Not Found");
@@ -80,7 +85,8 @@ public class LessonController {
         lessonModel.setDescription("Bem vindo a nova versão do Curso");
         lessonModel.setVideoUrl("http://localhost:8082/13253246524564");
         lessonService.save(lessonModel);
-
+        log.debug("PUT updateLesson lessonId saved {} ", lessonModel.getLessonId());
+        log.info("Lesson updated successfully lessonId {} ", lessonModel.getLessonId());
         return ResponseEntity.status(HttpStatus.OK).body(lessonModel);
     }
 
