@@ -1,7 +1,7 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dto.CourseDTO;
-import model.CourseModel;
+import com.ead.course.model.CourseModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.specification.SpecificationTemplate;
 import lombok.extern.log4j.Log4j2;

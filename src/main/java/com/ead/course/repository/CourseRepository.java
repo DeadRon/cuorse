@@ -1,6 +1,6 @@
 package com.ead.course.repository;
 
-import model.CourseModel;
+import com.ead.course.model.CourseModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
