@@ -1,6 +1,6 @@
 package com.ead.course.services.impl;
 
-import com.ead.course.model.LessonModel;
+import model.LessonModel;
 import com.ead.course.repository.LessonRepository;
 import com.ead.course.services.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;

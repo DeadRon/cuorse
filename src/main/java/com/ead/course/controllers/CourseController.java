@@ -1,11 +1,10 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dto.CourseDTO;
-import com.ead.course.model.CourseModel;
+import model.CourseModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.specification.SpecificationTemplate;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

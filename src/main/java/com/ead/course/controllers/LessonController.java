@@ -1,13 +1,12 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dto.LessonDTO;
-import com.ead.course.model.LessonModel;
-import com.ead.course.model.ModuleModel;
+import model.LessonModel;
+import model.ModuleModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
 import com.ead.course.specification.SpecificationTemplate;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,11 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.ead.course.specification.SpecificationTemplate.moduleCourseId;
 
 @Log4j2
 @RestController

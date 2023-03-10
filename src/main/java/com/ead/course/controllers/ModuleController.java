@@ -1,8 +1,8 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dto.ModuleDTO;
-import com.ead.course.model.CourseModel;
-import com.ead.course.model.ModuleModel;
+import model.CourseModel;
+import model.ModuleModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
 import com.ead.course.specification.SpecificationTemplate;
