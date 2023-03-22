@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)// não converta para json atributos nulos
 @Entity
-@Table(name = "TB_COURSES_USERs")
+@Table(name = "TB_COURSES_USERS")
 public class CourseUserModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -18,11 +18,9 @@ public class CourseUserModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private CourseModel course;
-
     @Column(nullable = false)
     private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private CourseModel course;
 
 }

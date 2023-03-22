@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ead-course
+    url: jdbc:postgresql://localhost:5433/ead-course
     username: postgres
     password: postgres
 
@@ -16,3 +16,19 @@ spring:
     properties:
       hibernate:
         show_sql: true
+
+  output:
+    ansi:
+      enabled: always
+
+  logging:
+    level:
+      com.ead: TRACE
+      #Traz informações relevantes e úteis sem auto detalhamenteo de DEBUG
+      root: INFO
+      #NÍVEIS DE LOG PARA O PACOTE: QUANDO RECEBER REQUISIÇÃO O CONSOLE IRÁ EXIBIR UM DETALHAMENTO MAIOR EM INFORMAÇÕES:
+      #método HTTP usado, método do controller usado, o que vem na requisição
+      #e detalhes do retorno da requisição. Enquanto deselve é bom para saber o que está vindo
+      #na requisição da API
+      org.springframework.web: DEBUG
+      org.hibernate: INFO

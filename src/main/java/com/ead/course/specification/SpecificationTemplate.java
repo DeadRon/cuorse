@@ -1,6 +1,7 @@
 package com.ead.course.specification;
 
 import com.ead.course.model.CourseModel;
+import com.ead.course.model.CourseUserModel;
 import com.ead.course.model.LessonModel;
 import com.ead.course.model.ModuleModel;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
@@ -10,6 +11,7 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import java.util.Collection;
@@ -46,7 +48,15 @@ public class SpecificationTemplate {
             Root<LessonModel> lesson = root;
             Root<ModuleModel> course = query.from(ModuleModel.class);
             Expression<Collection<LessonModel>> moduleLessons = course.get("lessons");
-            return cb.and(cb.equal(course.get("courseId"), moduleId), cb.isMember(lesson, moduleLessons));
+            return cb.and(cb.equal(course.get("moduleId"), moduleId), cb.isMember(lesson, moduleLessons));
+        };
+    }
+
+    public static Specification<CourseModel> courseUserId(final UUID userId){
+        return (root, query, cb) -> {
+          query.distinct(true);
+          Join<CourseModel, CourseUserModel> courseProd = root.join("coursesUsers");
+          return cb.equal(courseProd.get("userId"), userId);
         };
     }
 
