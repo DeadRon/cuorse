@@ -32,3 +32,4 @@ spring:
       #na requisição da API
       org.springframework.web: DEBUG
       org.hibernate: INFO
+
