@@ -18,9 +18,11 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpMethod.GET;
+
 @Log4j2
 @Component
-public class CourseClient {
+public class AuthUserClient {
 
     @Autowired
     private RestTemplate restTemplate;
@@ -52,7 +54,7 @@ public class CourseClient {
             Neste caso, é passado null, pois a chamada GET geralmente não possui corpo.
             responseType: Um objeto ParameterizedTypeReference que define o tipo esperado na resposta.
             Neste caso, espera-se um objeto ResponsePageDTO<CourseDTO>*/
-            result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+            result = restTemplate.exchange(url, GET, null, responseType);
             searchResult = result.getBody().getContent();
 
             log.debug("Response Number of Elements: {}", searchResult.size());
@@ -61,6 +63,11 @@ public class CourseClient {
         }
         log.info("Ending request /users courseId {}", courseId);
         return result.getBody();
+    }
+
+    public ResponseEntity<UserDTO> getOneUserById(UUID userId){
+        String url = REQUEST_URI_AUTHUSER + "/users/" + userId;
+        return restTemplate.exchange(url, GET, null, UserDTO.class);
     }
 
 }
