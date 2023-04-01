@@ -38,9 +38,10 @@ public class CourseController {
         BeanUtils.copyProperties(courseDTO, courseModel);
         courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        courseModel = courseService.save(courseModel);
         log.debug("POST saveCourse courseId saved {} ", courseModel.getCourseId());
-        log.info("Course saved successfully courseId {} ", courseModel.getCourseId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.save(courseModel));
+        log.info("Course saved successfully courseId: {} ", courseModel.getCourseId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseModel);
     }
 
     @DeleteMapping("/{courseId}")
