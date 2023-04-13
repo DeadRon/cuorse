@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 
 @Log4j2
@@ -77,5 +78,10 @@ public class AuthUserClient {
         courseUserDTO.setUserId(userId);
         courseUserDTO.setCourseId(courseId);
         restTemplate.postForObject(url, courseUserDTO, String.class);
+    }
+
+    public void deleteCourseInAuthUser(UUID courseId) {
+        String url = REQUEST_URI_AUTHUSER + "/users/courses" + courseId;
+        restTemplate.exchange(url, DELETE, null, String.class);
     }
 }
